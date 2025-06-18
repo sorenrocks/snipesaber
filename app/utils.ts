@@ -1,23 +1,38 @@
 import { responseLeaderboadError, responseNoRankedScores, responsePlayerNotFound } from './responses'
 import { Scores, Player } from './types'
 
-const fetchPlayerScores = async (scoresURL: string, rankedPlayCount: number): Promise<Scores> => {
+const fetchPlayerScores = async (scoresURL: string, rankedPlayCount: number, limit = 'limit'): Promise<Scores> => {
   let scores: Scores = { data: [] }
   let count = rankedPlayCount
   let page = 1
 
   // if over 100, paginate
   while (count > 0) {
-    const scoresRes = await fetch(`${scoresURL}&count=100&page=${page}`)
+    // specify a high timeout for the fetch request
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5 * 1000) // 5 seconds
+    const scoresRes = await fetch(`${scoresURL}&${limit}=100&page=${page}`, {
+      signal: controller.signal,
+      next: {
+        // cache to avoid hitting leaderboard APIs too often
+        revalidate: 15 * 60, // 15 minutes
+      },
+    })
+    clearTimeout(timeout)
     if (!scoresRes.ok) throw responseLeaderboadError
 
-    const newScores = (await scoresRes.json()) as Scores
+    const newScores = toScores(await scoresRes.json())
     if (newScores.data.length === 0) break
 
     scores.data.push(...newScores.data)
 
     count -= 100
     page += 1
+
+    // wait between requests to avoid hitting API rate limits
+    if (count > 0) {
+      await new Promise(resolve => setTimeout(resolve, 250)) // 250ms
+    }
   }
 
   return scores
@@ -36,6 +51,16 @@ const fetchPlayer = async (playerURL: string): Promise<Player> => {
 export const fetchBeatLeader = async (playerId: string): Promise<[Player, Scores]> => {
   const playerURL = `https://api.beatleader.com/player/${playerId}`
   const scoresURL = `https://api.beatleader.com/player/${playerId}/scores?sortBy=pp`
+
+  const player = await fetchPlayer(playerURL)
+  const scores = await fetchPlayerScores(scoresURL, player.rankedPlayCount, 'count')
+
+  return [player, scores]
+}
+
+export const fetchScoreSaber = async (playerId: string): Promise<[Player, Scores]> => {
+  const playerURL = `https://scoresaber.com/api/player/${playerId}/full`
+  const scoresURL = `https://scoresaber.com/api/player/${playerId}/scores?sort=top`
 
   const player = await fetchPlayer(playerURL)
   const scores = await fetchPlayerScores(scoresURL, player.rankedPlayCount)
@@ -105,8 +130,8 @@ export const toScores = (scores: any): Scores => {
           hash: score.leaderboard.songHash,
         },
         difficulty: {
-          modeName: score.difficulty.difficultyRaw.split('_').slice(1)[0].replace('Solo', ''),
-          difficultyName: score.difficulty.difficultyRaw.split('_')[0],
+          modeName: score.leaderboard.difficulty.difficultyRaw.split('_')[2].replace('Solo', ''),
+          difficultyName: score.leaderboard.difficulty.difficultyRaw.split('_')[1],
         },
       },
     })),

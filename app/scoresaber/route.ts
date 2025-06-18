@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { Playlist } from '../types'
-import { groupScores, imageToBase64, fetchBeatLeader } from '../utils'
+import { groupScores, imageToBase64, fetchScoreSaber } from '../utils'
 import { responsePlayerIdRequired, responseInternalError } from '../responses'
 
 export async function GET(request: NextRequest) {
@@ -9,14 +9,14 @@ export async function GET(request: NextRequest) {
     const playerId = url.searchParams.get('user')
     if (!playerId) throw responsePlayerIdRequired
 
-    const [player, scores] = await fetchBeatLeader(playerId)
+    const [player, scores] = await fetchScoreSaber(playerId)
     const songs = groupScores(scores)
 
     const playlist: Playlist = {
-      playlistTitle: `Snipe ${player.name} BL`,
+      playlistTitle: `Snipe ${player.name} SS`,
       playlistAuthor: 'SnipeSaber',
       customData: {
-        syncURL: `${url.origin}/beatleader?user=${playerId}`,
+        syncURL: `${url.origin}/scoresaber?user=${playerId}`,
       },
       songs: songs,
       image: await imageToBase64(player.avatar),
