@@ -1,13 +1,4 @@
-export interface BeatLeaderPlayer {
-  id: string
-  name: string
-  avatar: string
-  scoreStats: {
-    rankedPlayCount: number
-  }
-}
-
-export interface BeatLeaderScores {
+export interface Scores {
   data: {
     leaderboard: {
       song: {
@@ -21,6 +12,13 @@ export interface BeatLeaderScores {
       }
     }
   }[]
+}
+
+export interface Player {
+  id: string
+  name: string
+  avatar: string
+  rankedPlayCount: number
 }
 
 export interface Playlist {
