@@ -1,9 +1,9 @@
 import { responseLeaderboadError, responseNoRankedScores, responsePlayerNotFound } from './responses'
 import { Scores, Player } from './types'
 
-const fetchPlayerScores = async (scoresURL: string, rankedPlayCount: number, limit = 'limit'): Promise<Scores> => {
+const fetchPlayerScores = async (scoresURL: string, playCount: number, limit = 'limit'): Promise<Scores> => {
   let scores: Scores = { data: [] }
-  let count = rankedPlayCount
+  let count = playCount < 500 ? playCount : 500
   let page = 1
 
   // if over 100, paginate
@@ -15,7 +15,7 @@ const fetchPlayerScores = async (scoresURL: string, rankedPlayCount: number, lim
       signal: controller.signal,
       next: {
         // cache to avoid hitting leaderboard APIs too often
-        revalidate: 15 * 60, // 15 minutes
+        revalidate: 60 * 60, // 1 hour
       },
     })
     clearTimeout(timeout)
@@ -48,22 +48,22 @@ const fetchPlayer = async (playerURL: string): Promise<Player> => {
   return player
 }
 
-export const fetchBeatLeader = async (playerId: string): Promise<[Player, Scores]> => {
+export const fetchBeatLeader = async (playerId: string, count: number): Promise<[Player, Scores]> => {
   const playerURL = `https://api.beatleader.com/player/${playerId}`
   const scoresURL = `https://api.beatleader.com/player/${playerId}/scores?sortBy=pp`
 
   const player = await fetchPlayer(playerURL)
-  const scores = await fetchPlayerScores(scoresURL, player.rankedPlayCount, 'count')
+  const scores = await fetchPlayerScores(scoresURL, count > 0 ? count : player.rankedPlayCount, 'count')
 
   return [player, scores]
 }
 
-export const fetchScoreSaber = async (playerId: string): Promise<[Player, Scores]> => {
+export const fetchScoreSaber = async (playerId: string, count: number): Promise<[Player, Scores]> => {
   const playerURL = `https://scoresaber.com/api/player/${playerId}/full`
   const scoresURL = `https://scoresaber.com/api/player/${playerId}/scores?sort=top`
 
   const player = await fetchPlayer(playerURL)
-  const scores = await fetchPlayerScores(scoresURL, player.rankedPlayCount)
+  const scores = await fetchPlayerScores(scoresURL, count > 0 ? count : player.rankedPlayCount)
 
   return [player, scores]
 }
