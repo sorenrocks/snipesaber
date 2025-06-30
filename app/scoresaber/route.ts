@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
 
     const download = url.searchParams.get('download')
     if (download) {
-      const blob = new Blob([JSON.stringify(playlist)], { type: 'application/json' })
-      const filename = `snipe-${player.name}-ss.json`
+      const blob = new Blob([JSON.stringify(playlist, null, 2)], { type: 'application/json' })
+      const filename = `snipe-${player.name}-ss.bplist`
       return new Response(blob, {
         status: 200,
         headers: {

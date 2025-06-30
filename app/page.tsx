@@ -10,7 +10,7 @@ import { useState } from 'react'
 export default function Home() {
   const [playerId, setPlayerId] = useState<string>('')
   const [leaderboard, setLeaderboard] = useState<string>('scoresaber')
-  const [mapCount, setMapCount] = useState<number>(100)
+  const [scoreLimit, setScoreLimit] = useState<number>(100)
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col w-full gap-4">
               <Label htmlFor="mapCount" className="font-bold">
-                Map Count
+                Score Limit
               </Label>
               <div className="flex flex-row w-full gap-2">
                 <Slider
@@ -61,20 +61,28 @@ export default function Home() {
                   max={500}
                   min={100}
                   step={100}
-                  value={[mapCount]}
-                  onValueChange={value => setMapCount(value[0])}
+                  value={[scoreLimit]}
+                  onValueChange={value => setScoreLimit(value[0])}
                 />
-                <Label>{mapCount}</Label>
+                <Label>{scoreLimit}</Label>
               </div>
             </div>
           </div>
           <Button
+            className="cursor-pointer"
             disabled={
               playerId.length === 0 ||
-              mapCount < 100 ||
-              mapCount > 500 ||
+              scoreLimit < 100 ||
+              scoreLimit > 500 ||
               (leaderboard !== 'scoresaber' && leaderboard !== 'beatleader')
             }
+            onClick={() => {
+              const url = new URL(`/${leaderboard}`, window.location.origin)
+              url.searchParams.set('user', playerId)
+              url.searchParams.set('count', scoreLimit.toString())
+              url.searchParams.set('download', 'true')
+              window.location.href = url.toString()
+            }}
           >
             Generate Playlist
           </Button>
