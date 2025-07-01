@@ -160,6 +160,9 @@ export default function Home() {
             }
             onClick={() => {
               setLoading(true)
+              setTimeout(() => {
+                setLoading(false)
+              }, 4000)
               const url = new URL(`/${leaderboard}`, window.location.origin)
               url.searchParams.set('user', playerId)
               url.searchParams.set('count', scoreLimit.toString())
