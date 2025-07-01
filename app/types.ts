@@ -11,6 +11,7 @@ export interface Scores {
         difficultyName: string
       }
     }
+    pp: number
   }[]
 }
 

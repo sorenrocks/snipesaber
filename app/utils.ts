@@ -119,8 +119,10 @@ export const toPlayer = (player: any): Player => {
 }
 
 export const toScores = (scores: any): Scores => {
+  // beatleader
   if (scores.data) return scores as Scores
 
+  // scoresaber
   return {
     data: scores.playerScores.map((score: any) => ({
       leaderboard: {
@@ -134,6 +136,7 @@ export const toScores = (scores: any): Scores => {
           difficultyName: score.leaderboard.difficulty.difficultyRaw.split('_')[1],
         },
       },
+      pp: score.pp,
     })),
   }
 }

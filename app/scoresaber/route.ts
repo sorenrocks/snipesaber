@@ -13,13 +13,43 @@ export async function GET(request: NextRequest) {
     const count = parseInt(url.searchParams.get('count') || '0')
 
     const [player, scores] = await fetchScoreSaber(playerId, count)
+
+    // skip scores that are worse than the sniper's
+    const sniperId = url.searchParams.get('sniper')
+    const onlyBeatSniper = url.searchParams.get('beat') === 'true'
+    const onlyPlayedBySniper = url.searchParams.get('played') === 'true'
+    console.log(onlyBeatSniper, onlyPlayedBySniper)
+    if (sniperId && (onlyBeatSniper || onlyPlayedBySniper)) {
+      const [, sniperScores] = await fetchScoreSaber(sniperId, count)
+
+      const newScores = []
+
+      for (const score of scores.data) {
+        const sniperScore = sniperScores.data.find(
+          s =>
+            s.leaderboard.song.hash === score.leaderboard.song.hash &&
+            s.leaderboard.difficulty.modeName === score.leaderboard.difficulty.modeName &&
+            s.leaderboard.difficulty.difficultyName === score.leaderboard.difficulty.difficultyName
+        )
+
+        if (onlyPlayedBySniper && !sniperScore) continue // skip scores that are not played by the sniper
+        if (onlyBeatSniper && sniperScore && sniperScore.pp > score.pp) continue // skip scores that are worse than the sniper's
+
+        newScores.push(score)
+      }
+
+      scores.data = newScores
+    }
+
     const songs = groupScores(scores)
 
     const playlist: Playlist = {
       playlistTitle: `Snipe ${player.name} SS`,
       playlistAuthor: 'SnipeSaber',
       customData: {
-        syncURL: `${url.origin}/scoresaber?user=${playerId}&count=${count}`,
+        syncURL: `${url.origin}/scoresaber?user=${playerId}&count=${count}${sniperId ? `&sniper=${sniperId}` : ''}${
+          onlyBeatSniper ? '&beat=true' : ''
+        }${onlyPlayedBySniper ? '&played=true' : ''}`,
       },
       songs: songs,
       image: await imageToBase64(player.avatar),
