@@ -4,14 +4,14 @@ export const responsePlayerIdRequired = new Response(JSON.stringify({ error: 'Pl
 })
 
 export const responsePlayerNotFound = new Response(JSON.stringify({ error: 'Player not found' }), {
-  status: 404,
+  status: 400,
   headers: { 'Content-Type': 'application/json' },
 })
 
 export const responseNoRankedScores = new Response(
   JSON.stringify({ error: 'No ranked scores found for this player' }),
   {
-    status: 404,
+    status: 400,
     headers: { 'Content-Type': 'application/json' },
   }
 )

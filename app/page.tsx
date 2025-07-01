@@ -19,6 +19,8 @@ export default function Home() {
   const [sniperId, setSniperId] = useState<string>('')
   const [playedBySniper, setPlayedBySniper] = useState<boolean>(false)
 
+  const [loading, setLoading] = useState<boolean>(false)
+
   return (
     <>
       <main className="flex flex-col items-center pt-8 lg:justify-center bg-zinc-900 min-h-screen text-zinc-300">
@@ -29,6 +31,7 @@ export default function Home() {
               <a
                 className="text-orange-400 font-normal text-xs hover:underline cursor-pointer"
                 href={'https://github.com/sorenrocks/snipesaber'}
+                target="_blank"
               >
                 github repo
               </a>
@@ -152,9 +155,11 @@ export default function Home() {
               playerId.length === 0 ||
               scoreLimit < 100 ||
               scoreLimit > 500 ||
-              (leaderboard !== 'scoresaber' && leaderboard !== 'beatleader')
+              (leaderboard !== 'scoresaber' && leaderboard !== 'beatleader') ||
+              loading
             }
             onClick={() => {
+              setLoading(true)
               const url = new URL(`/${leaderboard}`, window.location.origin)
               url.searchParams.set('user', playerId)
               url.searchParams.set('count', scoreLimit.toString())
@@ -165,7 +170,7 @@ export default function Home() {
               window.location.href = url.toString()
             }}
           >
-            Generate Playlist
+            {loading ? '...' : 'Generate Playlist'}
           </Button>
         </div>
       </main>
