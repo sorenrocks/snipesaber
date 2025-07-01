@@ -2,7 +2,7 @@ import { responseLeaderboadError, responseNoRankedScores, responsePlayerNotFound
 import { Scores, Player } from './types'
 
 const fetchPlayerScores = async (scoresURL: string, playCount: number, limit = 'limit'): Promise<Scores> => {
-  let scores: Scores = { data: [] }
+  const scores: Scores = { data: [] }
   let count = playCount < 500 ? playCount : 500
   let page = 1
 

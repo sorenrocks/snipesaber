@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const sniperId = url.searchParams.get('sniper')
     const onlyBeatSniper = url.searchParams.get('beat') === 'true'
     const onlyPlayedBySniper = url.searchParams.get('played') === 'true'
-    console.log(onlyBeatSniper, onlyPlayedBySniper)
+
     if (sniperId && (onlyBeatSniper || onlyPlayedBySniper)) {
       const [, sniperScores] = await fetchScoreSaber(sniperId, count)
 
