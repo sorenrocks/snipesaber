@@ -24,7 +24,15 @@ export default function Home() {
       <main className="flex flex-col items-center pt-8 lg:justify-center bg-zinc-900 min-h-screen text-zinc-300">
         <div className="flex flex-col pl-12 pr-12 lg:w-1/3 lg:min-w-xl w-full">
           <div>
-            <h1 className="font-bold text-lg">SnipeSaber</h1>
+            <h1 className="font-bold text-lg">
+              SnipeSaber{' '}
+              <a
+                className="text-orange-400 font-normal text-xs hover:underline cursor-pointer"
+                href={'https://github.com/sorenrocks/snipesaber'}
+              >
+                github repo
+              </a>
+            </h1>
             <p>Beat Saber snipe playlist generator</p>
           </div>
 
