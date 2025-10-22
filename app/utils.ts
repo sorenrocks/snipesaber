@@ -124,19 +124,19 @@ export const toScores = (scores: any): Scores => {
 
   // scoresaber
   return {
-    data: scores.playerScores.map((score: any) => ({
+    data: scores.playerScores.map((s: any) => ({
       leaderboard: {
         song: {
-          name: score.leaderboard.songName,
-          author: score.leaderboard.songAuthorName,
-          hash: score.leaderboard.songHash,
+          name: s.leaderboard.songName,
+          author: s.leaderboard.songAuthorName,
+          hash: s.leaderboard.songHash,
         },
         difficulty: {
-          modeName: score.leaderboard.difficulty.difficultyRaw.split('_')[2].replace('Solo', ''),
-          difficultyName: score.leaderboard.difficulty.difficultyRaw.split('_')[1],
+          modeName: s.leaderboard.difficulty.difficultyRaw.split('_')[2].replace('Solo', ''),
+          difficultyName: s.leaderboard.difficulty.difficultyRaw.split('_')[1],
         },
       },
-      pp: score.pp,
+      pp: s.score.pp,
     })),
   }
 }
